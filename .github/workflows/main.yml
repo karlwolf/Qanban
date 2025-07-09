@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  notify-and-await:
+  notify-middleware:
     runs-on: ubuntu-latest
-    environment: approval-required
-
+    outputs:
+      environment_id: ${{ steps.get_env_id.outputs.environment_id }}
     steps:
       - name: Get GitHub Environment ID
         id: get_env_id
@@ -50,7 +50,13 @@ jobs:
               }
             }'
 
-      - name: Deployment
+  await-approval:
+    runs-on: ubuntu-latest
+    needs: notify-middleware
+    environment:
+      name: approval-required
+    steps:
+      - name: Deployment (aguarda aprovação do middleware via API)
         uses: chrnorm/deployment-action@v2
         with:
           token: "${{ secrets.GITHUB_TOKEN }}"
