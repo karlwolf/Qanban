@@ -1,0 +1,51 @@
+name: Notify Middleware and Await External Approval
+
+on:
+  workflow_dispatch:
+
+jobs:
+  notify-and-await:
+    runs-on: ubuntu-latest
+    environment:
+      name: approval-required
+
+    steps:
+      - name: Get GitHub Environment ID
+        id: get_env_id
+        run: |
+          ENV_ID=$(curl -sSL \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "${{ github.api_url }}/repos/${{ github.repository }}/environments/${{ github.job_environment }}" | jq -r '.id')
+
+          echo "environment_id=${ENV_ID}" >> $GITHUB_OUTPUT
+
+      - name: Notify Middleware
+        run: |
+          curl -X POST http://host.docker.internal:3000/api/github/action \
+            -H 'Content-Type: application/json' \
+            -d '{
+              "action_run_id": "${{ github.run_id }}",
+              "environment_id": "${{ steps.get_env_id.outputs.environment_id }}",
+              "project_id": "${{ github.event.repository.name }}",
+              "payload": {
+                  "Mudanca": "m1",
+                  "Categoria": "cat",
+                  "Subcategoria": "sub",
+                  "T2R": "t2r",
+                  "Nome_APP": "app",
+                  "Repositorio_URL": "${{ github.event.repository.html_url }}",
+                  "Namespace": "ns",
+                  "CLUSTER": "cluster",
+                  "Data_Inicio": "01/01/2024 10:00",
+                  "Data_Termino": "01/01/2024 12:00",
+                  "Grupo_Operador": "group",
+                  "Origem": "origin",
+                  "Descricao_Origem": "desc",
+                  "Produto": "prod",
+                  "Indisponibilidade": "Nao",
+                  "Impacto_Parceiros": "Nao",
+                  "Impacto_Elo": "Nao",
+                  "PCI": "Nao"
+              }
+            }'
