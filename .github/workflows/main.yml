@@ -16,13 +16,14 @@ jobs:
           ENV_ID=$(curl -sSL \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "${{ github.api_url }}/repos/${{ github.repository }}/environments/${{ github.job_environment }}" | jq -r '.id')
+            "${{ github.api_url }}/repos/${{ github.repository }}/environments/approval-required" \
+            | jq -r '.id')
 
           echo "environment_id=${ENV_ID}" >> $GITHUB_OUTPUT
 
       - name: Notify Middleware
         run: |
-          curl -X POST  https://72a6e3ddd0ff.ngrok-free.app/api/github/action \
+          curl -X POST https://SUA_URL_NGROK/api/github/action \
             -H 'Content-Type: application/json' \
             -d '{
               "action_run_id": "${{ github.run_id }}",
