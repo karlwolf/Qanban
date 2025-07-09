@@ -6,8 +6,7 @@ on:
 jobs:
   notify-and-await:
     runs-on: ubuntu-latest
-    environment:
-      name: approval-required
+    environment: approval-required
 
     steps:
       - name: Get GitHub Environment ID
@@ -23,49 +22,36 @@ jobs:
 
       - name: Notify Middleware
         run: |
-          curl -X POST https://72a6e3ddd0ff.ngrok-free.app/api/github/action \
+          curl -X POST https://SUA_URL_NGROK/api/github/action \
             -H 'Content-Type: application/json' \
             -d '{
               "action_run_id": "${{ github.run_id }}",
-              "environment_id": "${{ steps.get_env_id.outputs.environment_id }}"
+              "environment_id": "${{ steps.get_env_id.outputs.environment_id }}",
+              "project_id": "${{ github.event.repository.name }}",
+              "payload": {
+                  "Mudanca": "m1",
+                  "Categoria": "cat",
+                  "Subcategoria": "sub",
+                  "T2R": "t2r",
+                  "Nome_APP": "app",
+                  "Repositorio_URL": "${{ github.event.repository.html_url }}",
+                  "Namespace": "ns",
+                  "CLUSTER": "cluster",
+                  "Data_Inicio": "01/01/2024 10:00",
+                  "Data_Termino": "01/01/2024 12:00",
+                  "Grupo_Operador": "group",
+                  "Origem": "origin",
+                  "Descricao_Origem": "desc",
+                  "Produto": "prod",
+                  "Indisponibilidade": "Nao",
+                  "Impacto_Parceiros": "Nao",
+                  "Impacto_Elo": "Nao",
+                  "PCI": "Nao"
+              }
             }'
 
-      - name: Aguarda aprovação externa (deploy obrigatório)
-        uses: actions/github-script@v7
+      - name: Deployment
+        uses: chrnorm/deployment-action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.sha,
-              environment: '${{ github.job_environment }}',
-              required_contexts: [],
-              auto_merge: false
-            });
-
-            const deploymentId = deployment.data.id;
-            console.log(`Deployment criado com ID: ${deploymentId}`);
-
-            let deploymentStatus = null;
-            while (true) {
-              deploymentStatus = await github.rest.repos.listDeploymentStatuses({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                deployment_id: deploymentId
-              });
-
-              if (deploymentStatus.data.length > 0) {
-                const state = deploymentStatus.data[0].state;
-                console.log(`Estado atual do deployment: ${state}`);
-                if (state === 'success') {
-                  console.log('Deployment aprovado externamente.');
-                  break;
-                } else if (state === 'failure') {
-                  throw new Error('Deployment rejeitado externamente.');
-                }
-              }
-
-              console.log('Aguardando aprovação externa...');
-              await new Promise(resolve => setTimeout(resolve, 30000));
-            }
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          environment: approval-required
