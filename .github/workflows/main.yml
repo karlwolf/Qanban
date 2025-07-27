@@ -45,9 +45,9 @@ jobs:
                   "Produto": "prod",
                   "autor": "Joao da Silva",
                   "email": "joao@silva.com",
-                  "indisponibilidade": "Nao",
+                  "indisponibilidade": "Sim",
                   "impacto_parceiros": "Nao",
-                  "impacto_financeiro": "Nao",
+                  "impacto_financeiro": "Sim",
                   "PCI": "Nao"
               }
             }'
