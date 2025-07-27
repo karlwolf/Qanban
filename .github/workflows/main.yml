@@ -22,7 +22,7 @@ jobs:
 
       - name: Notify Middleware
         run: |
-          curl -X POST https://9084e2b5f554.ngrok-free.app/api/github/action \
+          curl -X POST https://8046ed7ff9f9.ngrok-free.app/api/github/action \
             -H 'Content-Type: application/json' \
             -d '{
               "action_run_id": "${{ github.run_id }}",
@@ -43,9 +43,11 @@ jobs:
                   "Origem": "origin",
                   "Descricao_Origem": "desc",
                   "Produto": "prod",
-                  "Indisponibilidade": "Nao",
-                  "Impacto_Parceiros": "Nao",
-                  "Impacto_Elo": "Nao",
+                  "autor": "Joao da Silva",
+                  "email": "joao@silva.com",
+                  "indisponibilidade": "Nao",
+                  "impacto_parceiros": "Nao",
+                  "impacto_financeiro": "Nao",
                   "PCI": "Nao"
               }
             }'
