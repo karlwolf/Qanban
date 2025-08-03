@@ -22,7 +22,7 @@ jobs:
 
       - name: Notify Middleware
         run: |
-          curl -X POST https://8046ed7ff9f9.ngrok-free.app/api/github/action \
+          curl -X POST  https://7b3bd3ae7c3e.ngrok-free.app/api/github/action \
             -H 'Content-Type: application/json' \
             -d '{
               "action_run_id": "${{ github.run_id }}",
